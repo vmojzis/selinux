@@ -123,8 +123,8 @@ int semanage_direct_is_managed(semanage_handle_t * sh)
 	if (semanage_check_init(sh, sh->conf->store_root_path))
 		goto err;
 
-	if (semanage_access_check(sh) < 0)
-		return 0;
+	//if (semanage_access_check(sh) < 0)
+	//	return 0;
 
 	return 1;
 
@@ -145,9 +145,6 @@ int semanage_direct_connect(semanage_handle_t * sh)
 	if (sh->create_store)
 		if (semanage_create_store(sh, 1))
 			goto err;
-
-	if (semanage_access_check(sh) < SEMANAGE_CAN_READ)
-		goto err;
 
 	sh->u.direct.translock_file_fd = -1;
 	sh->u.direct.activelock_file_fd = -1;
@@ -346,9 +343,9 @@ static int semanage_direct_disconnect(semanage_handle_t * sh)
 static int semanage_direct_begintrans(semanage_handle_t * sh)
 {
 
-	if (semanage_access_check(sh) != SEMANAGE_CAN_WRITE) {
-		return -1;
-	}
+	//if (semanage_access_check(sh) != SEMANAGE_CAN_WRITE) {
+	//	return -1;
+	//}
 	if (semanage_get_trans_lock(sh) < 0) {
 		return -1;
 	}
