@@ -177,6 +177,22 @@ except (OSError, ImportError):
             for l in self.log_list:
                 syslog.syslog(syslog.LOG_INFO, message + l)
 
+# Define a context manager to suppress stderr.
+class suppress_stderr(object):
+    def __init__(self):
+        # Open a /dev/null file to be used as stderr
+        self.null =  os.open(os.devnull,os.O_RDWR)
+        self.save_fd = os.dup(2)
+
+    def __enter__(self):
+        # Set stderr to the null file
+        os.dup2(self.null,2)
+
+    def __exit__(self, *_):
+        # Restore stderr
+        os.dup2(self.save_fd,2)
+        os.close(self.null)
+
 
 class nulllogger:
 
@@ -2510,7 +2526,8 @@ class fcontextRecords(semanageRecords):
                 raise ValueError(_("File context for %s is not defined") % target)
 
         try:
-            (rc, fcontext) = semanage_fcontext_query_local(self.sh, k)
+            with suppress_stderr():
+                (rc, fcontext) = semanage_fcontext_query_local(self.sh, k)
         except OSError:
             try:
                 (rc, fcontext) = semanage_fcontext_query(self.sh, k)
